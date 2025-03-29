@@ -23,7 +23,8 @@ private:
 	int fps;
 
 	// Cuerpo de box2d
-	b2Body* controlBody;
+	b2Body* boxBody;
+	b2Body* groundBody;
 
 public:
 
