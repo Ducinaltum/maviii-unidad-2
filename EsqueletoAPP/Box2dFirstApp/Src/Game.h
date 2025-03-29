@@ -25,6 +25,7 @@ private:
 	// Cuerpo de box2d
 	b2Body* ballBody;
 	b2Body* wallsBodies[4];
+	b2Body* obstacles[10];
 
 public:
 

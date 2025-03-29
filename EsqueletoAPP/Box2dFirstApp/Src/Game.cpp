@@ -5,6 +5,7 @@
 // Constructor de la clase Game
 Game::Game(int ancho, int alto, std::string titulo)
 {
+    std::srand(NULL); // Seed random number generator
     // Inicialización de la ventana y configuración de propiedades
     wnd = new RenderWindow(VideoMode(ancho, alto), titulo);
     wnd->setVisible(true);
@@ -13,7 +14,6 @@ Game::Game(int ancho, int alto, std::string titulo)
     frameTime = 1.0f / fps;
     SetZoom(); // Configuración de la vista del juego
     InitPhysics(); // Inicialización del motor de física
-    ballBody->ApplyLinearImpulse(b2Vec2(5000000, 0), b2Vec2(400, 300), true);
 }
 
 // Configuración de la vista del juego
@@ -116,6 +116,35 @@ void Game::InitPhysics()
         //le decimos al cuerpo rigido que instance el fixture y se lo establezca
         b2Fixture* pFloorFixture = wallsBodies[i]->CreateFixture(&floorFixtureDef);
     }
+    for(int i = 0; i < 10; i++)
+    {
+        //Agregar objeto PISO
+        obstacles[i] = NULL;
+
+        b2BodyDef blockFloorDef;
+        blockFloorDef.type = b2BodyType::b2_staticBody;
+        blockFloorDef.position = b2Vec2((std::rand() % 600) + 100, (std::rand() % 450) + 75);
+        blockFloorDef.angle = std::rand();
+
+        //Esto tiene que ir antes o después del fixture
+        obstacles[i] = phyWorld->CreateBody(&blockFloorDef);
+
+        //creamos la definición para nuestro fixture
+        //Cambiar a box
+        b2FixtureDef floorFixtureDef;
+        floorFixtureDef.friction = 0.3f;
+        floorFixtureDef.density = 1.0f;
+
+        b2PolygonShape boxShape;
+        boxShape.SetAsBox((std::rand() % 30)+10, (std::rand() % 30) + 10); // Box size (half-width, half-height)
+
+        //establecemos la forma al fixture
+        floorFixtureDef.shape = &boxShape;
+
+        //le decimos al cuerpo rigido que instance el fixture y se lo establezca
+        b2Fixture* pFloorFixture = obstacles[i]->CreateFixture(&floorFixtureDef);
+    }
+    ballBody->ApplyLinearImpulse(b2Vec2(5000000, 0), b2Vec2(400, 300), true);
 }
 
 // Bucle principal del juego
