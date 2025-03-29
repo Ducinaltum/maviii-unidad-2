@@ -22,9 +22,11 @@ private:
 	float frameTime;
 	int fps;
 
+	
 	// Cuerpo de box2d
-	b2Body* boxBody;
-	b2Body* groundBody;
+	b2Body* cannonBall;
+
+	b2Vec2* direction;
 
 public:
 

@@ -36,59 +36,34 @@ void Game::InitPhysics()
 	debugRender->SetFlags(UINT_MAX);
 	phyWorld->SetDebugDraw(debugRender);
 
+	direction = new b2Vec2(100, 100);
 	{
 		//Agregar objeto PISO
-		boxBody = NULL;
+		cannonBall = NULL;
 
-		b2BodyDef boxDef;
-		boxDef.type = b2BodyType::b2_dynamicBody;
-		boxDef.position = b2Vec2(400, 300);
-		boxDef.allowSleep = false;
+		b2BodyDef cannonBallDef;
+		cannonBallDef.type = b2BodyType::b2_dynamicBody;
+		cannonBallDef.position = b2Vec2(400, 300);
+		cannonBallDef.bullet = true;
+		cannonBallDef.linearDamping = 0;
 
 		//Esto tiene que ir antes o después del fixture
-		boxBody = phyWorld->CreateBody(&boxDef);
+		cannonBall = phyWorld->CreateBody(&cannonBallDef);
 
 		//creamos la definición para nuestro fixture
 		//Cambiar a box
-		b2FixtureDef boxFixtureDef;
-		boxFixtureDef.friction = 1.0f;
-		boxFixtureDef.density = 1.0f;
+		b2FixtureDef cannonBallFixtureDef;
+		cannonBallFixtureDef.friction = 0.0f;
+		cannonBallFixtureDef.density = 1.0f;
 
-		b2PolygonShape boxShape;
-		boxShape.SetAsBox(50.0f, 40.0f); // Box size (half-width, half-height)
-
-		//establecemos la forma al fixture
-		boxFixtureDef.shape = &boxShape;
-
-		//le decimos al cuerpo rigido que instance el fixture y se lo establezca
-		b2Fixture* pFloorFixture = boxBody->CreateFixture(&boxFixtureDef);
-	}
-	{
-		//Agregar objeto PISO
-		groundBody = NULL;
-
-		b2BodyDef groundDef;
-		groundDef.type = b2BodyType::b2_staticBody;
-		groundDef.position = b2Vec2(400, 500);
-		groundDef.angle = b2_pi / 6;
-
-		//Esto tiene que ir antes o después del fixture
-		groundBody = phyWorld->CreateBody(&groundDef);
-
-		//creamos la definición para nuestro fixture
-		//Cambiar a box
-		b2FixtureDef groundFixtureDef;
-		groundFixtureDef.friction = 1.0f;
-		groundFixtureDef.density = 1.0f;
-
-		b2PolygonShape boxShape;
-		boxShape.SetAsBox(400.0f, 100.0f); // Box size (half-width, half-height)
+		b2CircleShape circleShape;
+		circleShape.m_radius = 25.0f;
 
 		//establecemos la forma al fixture
-		groundFixtureDef.shape = &boxShape;
+		cannonBallFixtureDef.shape = &circleShape;
 
 		//le decimos al cuerpo rigido que instance el fixture y se lo establezca
-		b2Fixture* pFloorFixture = groundBody->CreateFixture(&groundFixtureDef);
+		b2Fixture* pFloorFixture = cannonBall->CreateFixture(&cannonBallFixtureDef);
 	}
 }
 
@@ -120,19 +95,24 @@ void Game::DoEvents()
 		}
 		if (Keyboard::isKeyPressed(Keyboard::Up) || Keyboard::isKeyPressed(Keyboard::W))
 		{
-			float friction = boxBody->GetFixtureList()->GetFriction() + 0.01f;
-			friction = fmax(friction, 0);
-			boxBody->GetFixtureList()->SetFriction(friction);
-			groundBody->GetFixtureList()->SetFriction(friction);
-			std::cout << friction << std::endl;
+			direction->y += 10.0f;
+			std::cout << direction->y << std::endl;
 		}
 		if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S))
 		{
-			float friction = boxBody->GetFixtureList()->GetFriction() - 0.01f;
-			friction = fmax(friction, 0);
-			boxBody->GetFixtureList()->SetFriction(friction);
-			groundBody->GetFixtureList()->SetFriction(friction);
-			std::cout << friction << std::endl;
+			direction->y -= 10.0f;
+			std::cout << direction->y << std::endl;
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Space))
+		{
+			float force = 200000;
+			b2Vec2 normalizedDirection(direction->x, direction->y);
+			normalizedDirection.Normalize();
+			b2Vec2 result(normalizedDirection.x * force, normalizedDirection.y * -force);
+			cannonBall->SetTransform(b2Vec2(50,550), 0);
+			cannonBall->SetLinearVelocity(b2Vec2(0,0));
+			cannonBall->ApplyLinearImpulseToCenter(result, true);
+			std::cout << "Shoot " << result.x<< " " << result.y << std::endl;
 		}
 
 	}
