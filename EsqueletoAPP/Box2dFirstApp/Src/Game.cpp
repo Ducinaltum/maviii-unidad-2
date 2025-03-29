@@ -43,6 +43,7 @@ void Game::InitPhysics()
 		b2BodyDef boxDef;
 		boxDef.type = b2BodyType::b2_dynamicBody;
 		boxDef.position = b2Vec2(400, 300);
+		boxDef.allowSleep = false;
 
 		//Esto tiene que ir antes o después del fixture
 		boxBody = phyWorld->CreateBody(&boxDef);
@@ -50,7 +51,7 @@ void Game::InitPhysics()
 		//creamos la definición para nuestro fixture
 		//Cambiar a box
 		b2FixtureDef boxFixtureDef;
-		boxFixtureDef.friction = 0.3f;
+		boxFixtureDef.friction = 1.0f;
 		boxFixtureDef.density = 1.0f;
 
 		b2PolygonShape boxShape;
@@ -69,6 +70,7 @@ void Game::InitPhysics()
 		b2BodyDef groundDef;
 		groundDef.type = b2BodyType::b2_staticBody;
 		groundDef.position = b2Vec2(400, 500);
+		groundDef.angle = b2_pi / 6;
 
 		//Esto tiene que ir antes o después del fixture
 		groundBody = phyWorld->CreateBody(&groundDef);
@@ -76,7 +78,7 @@ void Game::InitPhysics()
 		//creamos la definición para nuestro fixture
 		//Cambiar a box
 		b2FixtureDef groundFixtureDef;
-		groundFixtureDef.friction = 0.5f;
+		groundFixtureDef.friction = 1.0f;
 		groundFixtureDef.density = 1.0f;
 
 		b2PolygonShape boxShape;
@@ -116,11 +118,6 @@ void Game::DoEvents()
 			wnd->close(); // Cerrar la ventana si se presiona el botón de cerrar
 			break;
 		}
-		float force = 50000;
-		if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A))
-			boxBody->ApplyForceToCenter(b2Vec2(force * -1, 0.0f), true);
-		if (Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D))
-			boxBody->ApplyForceToCenter(b2Vec2(force, 0.0f), true);
 		if (Keyboard::isKeyPressed(Keyboard::Up) || Keyboard::isKeyPressed(Keyboard::W))
 		{
 			float friction = boxBody->GetFixtureList()->GetFriction() + 0.01f;
