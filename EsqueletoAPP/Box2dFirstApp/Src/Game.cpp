@@ -92,29 +92,19 @@ void Game::DoEvents()
 		case Event::Closed:
 			wnd->close(); // Cerrar la ventana si se presiona el botón de cerrar
 			break;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Up) || Keyboard::isKeyPressed(Keyboard::W))
-		{
-			direction->y += 10.0f;
-			std::cout << direction->y << std::endl;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S))
-		{
-			direction->y -= 10.0f;
-			std::cout << direction->y << std::endl;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Space))
-		{
+		case Event::MouseButtonPressed:
 			float force = 200000;
-			b2Vec2 normalizedDirection(direction->x, direction->y);
+			Vector2f pos = wnd->mapPixelToCoords(Vector2i(evt.mouseButton.x, evt.mouseButton.y));
+			pos.y = 600 - pos.y;
+			b2Vec2 normalizedDirection(pos.x, pos.y);
 			normalizedDirection.Normalize();
 			b2Vec2 result(normalizedDirection.x * force, normalizedDirection.y * -force);
-			cannonBall->SetTransform(b2Vec2(50,550), 0);
-			cannonBall->SetLinearVelocity(b2Vec2(0,0));
+			cannonBall->SetTransform(b2Vec2(50, 550), 0);
+			cannonBall->SetLinearVelocity(b2Vec2(0, 0));
 			cannonBall->ApplyLinearImpulseToCenter(result, true);
-			std::cout << "Shoot " << result.x<< " " << result.y << std::endl;
+			std::cout << "Shoot " << result.x << " " << result.y << std::endl;
+			break;
 		}
-
 	}
 }
 
